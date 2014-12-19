@@ -29,6 +29,8 @@ public class Cell {
 			return Color.MAGENTA;
 		case 6:
 			return Color.yellow;
+		case 0:
+			return Color.CYAN;
 		}
 		return Color.white;
 	}

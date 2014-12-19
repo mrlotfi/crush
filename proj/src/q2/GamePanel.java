@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit;
 
 
 @SuppressWarnings("serial")
-public class GamePanel extends JPanel {
+public class GamePanel extends JPanel {// in felan hame chi has. ham panel ham engine :D
 	private Cell[][] cells;
 	private boolean isActive;
 	private int x,y;
@@ -22,6 +22,7 @@ public class GamePanel extends JPanel {
 		isActive = false;
 		this.setSize(1000,700);
 		setBounds(10,10,800,640);
+		
 		addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
@@ -41,24 +42,96 @@ public class GamePanel extends JPanel {
 						cells[x][y] = cells[row][column];
 						cells[row][column] = cell;
 					}
-					destroyAndInsert(x,y,row,column);
+					
+					destroyAfterMove(x,y,row,column);
+					while(clearTable()) 
+						refillTable();
 					repaint();
 				}
 			}
 		});
 	}
 
+	public void rearrangeCells() {
+		for(int i=2;i<12;i++) 
+			shiftAndInsert(i);
+	}
 	
-	public void destroyAndInsert(int x1, int y1, int x2, int y2) {
-		int a = 0,b=0,c=0,d=0;
+	public boolean clearTable() {
+		boolean ret = false;
+		for(int x1=2;x1<12;x1++) {
+			for(int y1=2;y1<12;y1++) {
+				if(cells[x][y1].getType() != -1) {
+				int a = 0,b=0;boolean his = false;
+				while(cells[x1][y1].getType() == cells[x1-a][y1].getType())
+					a++;
+				while(cells[x1][y1].getType() == cells[x1+b][y1].getType())
+					b++;
+				a--;b--;
+				if(a+b>=2) {
+					his = true;
+					ret= true;
+					for(int i=(-1)*a;i<=b;i++) {
+						if(i!=0)
+							cells[x1+i][y1].setType(-1);;
+					}
+				}
+				a=b=0;
+				while(cells[x1][y1].getType() == cells[x1][y1-a].getType())
+					a++;
+				while(cells[x1][y1].getType() == cells[x1][y1+b].getType())
+					b++;
+				a--;b--;
+				if(a+b>=2) {
+					ret = true;
+					his = true;
+					for(int i=(-1)*a;i<=b;i++) {
+						if(i!=0)
+							cells[x1][y1+i].setType(-1);
+					}
+				}
+				if(his)
+					cells[x1][y1].setType(-1);
+				}
+			}
+		}
+		if(ret)
+			rearrangeCells();
+		return ret;
+	}
+	
+	public void shiftAndInsert(int row) {
+		int s=0;
+		while(s<9) {
+			if(cells[row][10-s].getType() != -1)
+				s++;
+			else {
+				
+					for(int i=s;i<9;i++)//shift
+						cells[row][10-i] = cells[row][10-(i+1)];
+			}
+		}
+		refillTable();
+	}
+	
+	public void refillTable() {
+		for(int i=2;i<12;i++)
+			for(int j=2;j<12;j++)
+				if(cells[i][j].getType() == 0) 
+					cells[i][j] = new Cell(i,j,new Random().nextInt(6)+1);
+	}
+	public void destroyAfterMove(int x1, int y1, int x2, int y2) {
+		int a = 0,b=0;boolean his = false;
 		while(cells[x1][y1].getType() == cells[x1-a][y1].getType())
 			a++;
 		while(cells[x1][y1].getType() == cells[x1+b][y1].getType())
 			b++;
 		a--;b--;
 		if(a+b>=2) {
+			his = true;
 			for(int i=(-1)*a;i<=b;i++) {
-				cells[x1+i][y1].setType(-1);
+				if(i!=0)
+					cells[x1+i][y1].setType(-1);;
 			}
 		}
 		a=b=0;
@@ -68,19 +141,26 @@ public class GamePanel extends JPanel {
 			b++;
 		a--;b--;
 		if(a+b>=2) {
+			his = true;
 			for(int i=(-1)*a;i<=b;i++) {
-				cells[x1][y1+i].setType(-1);
+				if(i!=0)
+					cells[x1][y1+i].setType(-1);
 			}
-		}//
-		a=b=0;
+		}
+		if(his)
+			cells[x1][y1].setType(-1);
+		//
+		a=b=0;his = false;
 		while(cells[x2][y2].getType() == cells[x2-a][y2].getType())
 			a++;
 		while(cells[x2][y2].getType() == cells[x2+b][y2].getType())
 			b++;
 		a--;b--;
 		if(a+b>=2) {
+			his = true;
 			for(int i=(-1)*a;i<=b;i++) {
-				cells[x2+i][y2].setType(-1);
+				if(i!=0)
+					cells[x2+i][y2].setType(-1);
 			}
 		}
 		a=b=0;
@@ -90,12 +170,16 @@ public class GamePanel extends JPanel {
 			b++;
 		a--;b--;
 		if(a+b>=2) {
+			his = true;
 			for(int i=(-1)*a;i<=b;i++) {
-				cells[x2][y2+i].setType(-1);
+				if(i!=0)
+					cells[x2][y2+i].setType(-1);
 			}
 		}
+		if(his)
+			cells[x2][y2].setType(-1);;
 		// alan khalia manfie yekan
-		//rearrangeCells();
+		rearrangeCells();
 	}
 	
 	public boolean isThereMove() {
