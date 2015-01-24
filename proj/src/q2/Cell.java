@@ -37,8 +37,9 @@ public class Cell {
 	public void setType(int type) {
 		this.type = type;
 	}
+	
 	public void draw(Graphics g) {
 		g.setColor(getColor());
-	//	g.fillOval(arg0, arg1, arg2, arg3);
-	}
+		g.fillOval(10+(x-2)*60, 10+(y-2)*60, 40, 40);
+	} 
 }
